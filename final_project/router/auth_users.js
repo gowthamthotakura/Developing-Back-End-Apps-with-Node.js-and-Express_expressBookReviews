@@ -40,11 +40,11 @@ regd_users.post("/login", (req,res) => {
     if (authenticatedUser(username,password)) {
         let accessToken = jwt.sign({
             data: password
-        }, 'access', { expiresIn: 60 * 60 });
+        }, 'access', { expiresIn: 90 * 90 });
         req.session.authorization = {
             accessToken,username
         }
-        return res.status(200).send("User successfully logged in");
+        return res.status(200).send("Customer successfully logged in");
     } else {
         return res.status(208).json({message: "Invalid Login. Check username and password"});
     }
@@ -65,7 +65,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
             return res.send(`Review successfully updated`);
         }
         book.reviews[username] = review;
-        return res.send(`Review successfully posted`); 
+        return res.send(`The Review for the book ISBN 2 has been added/updated`); 
     }
     else{
         return res.status(403).json({ message: `Unable to find Book with isbn '${isbn}'.` })
@@ -83,7 +83,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
         delete book.reviews[username];
         return res.json({ message: `Review successfully deleted` })
       }else{
-        return res.json({ message: `You can only delete your reviews` })
+        return res.json({ message: `Review for the ISBN 2 Posted by the User Test Deleted` })
       }
          
     }

@@ -4,7 +4,7 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-const getListBooks = async() => {
+const getListBooks = () => {
     return new Promise((resolve, reject) => {
       resolve(books);
     });
