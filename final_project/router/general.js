@@ -3,94 +3,128 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-const axios = require('axios');
 
-//  Task 6
-//  Register a new user
-public_users.post("/register", (req,res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
-    }
-    if (users.find((user) => user.username === username)) {
-      return res.status(409).json({ message: "Username already exists" });
-    }
-    users.push({ username, password });
-    return res.status(201).json({ message: "User registered successfully" });
-});
-
-//  Task10
-// Get book lists
-const getBooks = () => {
+const getListBooks = async() => {
     return new Promise((resolve, reject) => {
-        resolve(books);
+      resolve(books);
     });
-};
+}
 
-//  Task 1
-//  Get the book list available in the shop
-public_users.get('/',async function (req, res) {
-  try {
-    const bookList = await getBooks(); 
-    res.json(bookList); // Neatly format JSON output
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error retrieving book list" });
-  }
-});
-
-//  Task 11
-// Get book details based on ISBN
-const getByISBN = (isbn) => {
+const getBookByIsbn = async(isbn) => {
     return new Promise((resolve, reject) => {
-        let isbnNum = parseInt(isbn);
-        if (books[isbnNum]) {
-            resolve(books[isbnNum]);
-        } else {
-            reject({ status: 404, message: `ISBN ${isbn} not found` });
+        let book = books[isbn];
+        if(isbn){
+            resolve(book);
+        } 
+    });
+}
+
+const getBookByAuth = async(author) => {
+    return new Promise((resolve, reject) => {
+        if(author){
+            const filtered_keys = Object.keys(books).filter((key) => books[key].author === author);
+            const result = filtered_keys.map(key => books[key]);
+            resolve(result);
         }
+        
     });
-};
+}
 
-//  Task 2
-//  Get book details based on ISBN
+const getBookByTitle = async(title) => {
+    return new Promise((resolve, reject) => {
+        if(title){
+            const filtered_keys = Object.keys(books).filter((key) => books[key].title === title);
+            const result = filtered_keys.map(key => books[key]);
+            resolve(result);
+        }
+        
+    });
+}
+
+public_users.post("/register", (req,res) => {
+  //Write your code here
+  const username = req.body.username;
+  const password = req.body.password;
+  if (username && password) {
+    if (!isValid(username)) {
+      users.push({"username":username,"password":password});
+      return res.status(200).json({message: "User successfully registred. Now you can login"});
+    } else {
+      return res.status(404).json({message: "User already exists!"});
+    }
+  }
+  return res.status(404).json({message: "Unable to register user."});
+//   return res.status(300).json({message: "Yet to be implemented"});
+});
+
+
+// Get the book list available in the shop
+public_users.get('/',function (req, res) {
+  //Write your code here
+    // res.send(JSON.stringify({books},null,4));
+    getListBooks()
+        .then((books) =>  res.send(JSON.stringify({books},null,4)))
+//   return res.status(300).json({message: "Yet to be implemented"});
+});
+
+// Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-    getByISBN(req.params.isbn)
-    .then(
-        result => res.send(result),
-        error => res.status(error.status).json({message: error.message})
-    );
+  //Write your code here
+    const isbn = req.params.isbn;
+    getBookByIsbn(isbn)
+        .then((book) =>  {
+            if (book === undefined) {
+                return res.status(403).json({ message: `Unable to find Book with isbn '${isbn}'.` })
+            }
+            res.send(books[isbn])
+        })
+    // res.send(books[isbn])
+//   return res.status(300).json({message: "Yet to be implemented"});
  });
-
-//  Task 3 & Task 12
-//  Get book details based on author
+  
+// Get book details based on author
 public_users.get('/author/:author',function (req, res) {
+  //Write your code here
     const author = req.params.author;
-    getBooks()
-    .then((bookEntries) => Object.values(bookEntries))
-    .then((books) => books.filter((book) => book.author === author))
-    .then((filteredBooks) => res.send(filteredBooks));
+    getBookByAuth(author)
+        .then((result) =>  {
+            if (Object.keys(result).length>0) {
+                res.send(result)
+            }else{
+                return res.status(403).json({ message: `Unable to find books by author '${author}'.` })
+            }
+    })
+    // const filtered_keys = Object.keys(books).filter((key) => books[key].author === author);
+    // const result = filtered_keys.map(key => books[key]);
+    // res.send(result);
+//   return res.status(300).json({message: "Yet to be implemented"});
 });
 
-//  Task 4 & Task 12
-//  Get all books based on title
+// Get all books based on title
 public_users.get('/title/:title',function (req, res) {
+  //Write your code here
     const title = req.params.title;
-    getBooks()
-    .then((bookEntries) => Object.values(bookEntries))
-    .then((books) => books.filter((book) => book.title === title))
-    .then((filteredBooks) => res.send(filteredBooks));
+    getBookByTitle(title)
+        .then((result) =>  {
+            if (Object.keys(result).length>0) {
+                res.send(result)
+            }else{
+                return res.status(403).json({ message: `Unable to find books by title '${title}'.` })
+            }
+            
+    })
+    // const filtered_keys = Object.keys(books).filter((key) => books[key].title === title);
+    // const result = filtered_keys.map(key => books[key]);
+    // res.send(result);
+//   return res.status(300).json({message: "Yet to be implemented"});
 });
 
-//  Task 5 & Task 13
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
+  //Write your code here
     const isbn = req.params.isbn;
-    getByISBN(req.params.isbn)
-    .then(
-        result => res.send(result.reviews),
-        error => res.status(error.status).json({message: error.message})
-    );
+    res.send(books[isbn].reviews)
+//   return res.status(300).json({message: "Yet to be implemented"});
 });
 
 module.exports.general = public_users;
