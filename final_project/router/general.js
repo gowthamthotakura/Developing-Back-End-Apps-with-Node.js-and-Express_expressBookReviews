@@ -4,37 +4,32 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-public_users.get('/async-get-books',function (req, res) {
-
-    const get_books = new Promise((resolve, reject) => {
-        resolve(res.send(JSON.stringify({books}, null, 4)));
-      });
-
-      get_books.then(() => console.log("Promise for Task 10 resolved"));
-
-  });
-
-
-  public_users.get('/books/isbn/:isbn',function (req, res) {
-    const get_books_isbn = new Promise((resolve, reject) => {
-    const isbn = req.params.isbn;
-    // console.log(isbn);
-        if (req.params.isbn <= 10) {
-        resolve(res.send(books[isbn]));
+const axios = require('axios');
+const books = require('./booksdb.js'); // Importing the local books data
+public_users.get('/', async function (req, res) {
+    try {
+        let list_books = await axios.get('http://localhost:5000/books'); // This is the simulated API call
+        return res.status(200).json(list_books.data);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error retrieving book list' });
     }
-        else {
-            reject(res.send('ISBN not found'));
-        }
-    });
-    get_books_isbn.
-        then(function(){
-            console.log("Promise for Task 11 is resolved");
-   }).
-        catch(function () { 
-                console.log('ISBN not found');
-  });
-
 });
+
+
+
+public_users.get('/isbn/:isbn', async function (req, res) {
+    let isbn = req.params.isbn;
+    try {
+        let book_details = await axios.get(`http://localhost:5000/books/isbn/${isbn}`); // Simulating an API call
+        return res.status(200).json(book_details.data);
+    } catch (error) {
+        return res.status(404).json({ message: 'ISBN is invalid' });
+    }
+});
+
+
+
+
 
 const getBookByAuth = async(author) => {
     return new Promise((resolve, reject) => {
