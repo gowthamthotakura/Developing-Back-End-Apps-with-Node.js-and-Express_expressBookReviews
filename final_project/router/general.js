@@ -4,32 +4,20 @@ let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
-const axios = require('axios');
-const books = require('./booksdb.js'); // Importing the local books data
-public_users.get('/', async function (req, res) {
-    try {
-        let list_books = await axios.get('http://localhost:5000/books'); // This is the simulated API call
-        return res.status(200).json(list_books.data);
-    } catch (error) {
-        return res.status(500).json({ message: 'Error retrieving book list' });
-    }
-});
+const getListBooks = async() => {
+    return new Promise((resolve, reject) => {
+      resolve(books);
+    });
+}
 
-
-
-public_users.get('/isbn/:isbn', async function (req, res) {
-    let isbn = req.params.isbn;
-    try {
-        let book_details = await axios.get(`http://localhost:5000/books/isbn/${isbn}`); // Simulating an API call
-        return res.status(200).json(book_details.data);
-    } catch (error) {
-        return res.status(404).json({ message: 'ISBN is invalid' });
-    }
-});
-
-
-
-
+const getBookByIsbn = async(isbn) => {
+    return new Promise((resolve, reject) => {
+        let book = books[isbn];
+        if(isbn){
+            resolve(book);
+        } 
+    });
+}
 
 const getBookByAuth = async(author) => {
     return new Promise((resolve, reject) => {
