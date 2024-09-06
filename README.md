@@ -15,3 +15,9 @@ Delete a book review (logged-in users can delete only their reviews)
 
 I have developed the code further to implement the CRUD capabilities as HTTP methods in my Express server and tested them using Postman. You will also implement Session and JWTauthentication to allow only logged-in users to perform certain operations.
 I have enhanced the code using Promises, Callbacks or Async/Await functions to allow multiple users to interact with the applications simultaneously without waiting for each other’s operations to complete.
+
+
+The project knowledge:
+* How to write code that implements session and JWT authentication that only allows logged-in users to perform specified operations.
+* Writing a RESTful web service given skeleton code using the Express framework.
+* How to generate code that uses promises, callbacks, and/or Async/Await functions to allow multiple users to interact with an application simultaneously.
