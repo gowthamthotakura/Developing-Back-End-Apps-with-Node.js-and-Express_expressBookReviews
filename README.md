@@ -17,7 +17,3 @@ I have developed the code further to implement the CRUD capabilities as HTTP met
 I have enhanced the code using Promises, Callbacks or Async/Await functions to allow multiple users to interact with the applications simultaneously without waiting for each other’s operations to complete.
 
 
-The project knowledge:
-* How to write code that implements session and JWT authentication that only allows logged-in users to perform specified operations.
-* Writing a RESTful web service given skeleton code using the Express framework.
-* How to generate code that uses promises, callbacks, and/or Async/Await functions to allow multiple users to interact with an application simultaneously.
